@@ -18,7 +18,7 @@ run: up ## Alias for 'up'
 
 proxy: ## Port-forward ArgoCD UI to localhost:8080
 	@echo "Port-forwarding ArgoCD. Username is 'admin'. Get password via: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath=\"{.data.password}\" | base64 -d"
-	@kubectl port-forward svc/argocd-server -n argocd 8080:443
+	@kubectl port-forward svc/argocd-server -n argocd 8080:80
 
 clean: ## Destroy the local kind cluster
 	@echo "Destroying local kind cluster..."
