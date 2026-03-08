@@ -17,12 +17,16 @@ kube-prometheus-stack:
     grafana.ini:
       server:
         root_url: http://grafana.local
+      security:
+        # Disable the Grafana secret-leak check for local dev
+        # In production use ExternalSecrets + env vars
+        assertNoLeakedSecrets: false
       auth.generic_oauth:
         enabled: true
         name: Keycloak
         allow_sign_up: true
         client_id: grafana
-        # Client Secret normally injected via External Secrets
+        # In production, inject this via an ExternalSecret / environment variable
         client_secret: dummy-secret
         scopes: openid email profile roles
         auth_url: http://keycloak.local/realms/idp/protocol/openid-connect/auth
