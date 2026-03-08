@@ -85,3 +85,5 @@ At this point, Terraform is finished. ArgoCD connects to the Git repository, rea
 # Multi Agent Safety
 - When you see unrecognized files just keep going, focus only on files that you recognize.
 - When a user asks to push changes to git,, run `git pull --rebase` to integrate latest changes
+- Do not switch branches or check out a new/different branch unless the user requests you to.
+
