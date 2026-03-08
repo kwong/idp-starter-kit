@@ -3,6 +3,11 @@ keycloak:
     adminUser: admin
     # In production, use External Secrets to populate this
     adminPassword: admin
+  image:
+    registry: quay.io
+    repository: keycloak/keycloak
+    tag: "26.3.3"
+    pullPolicy: IfNotPresent
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -32,6 +37,10 @@ keycloak:
       username: bn_keycloak
       password: "postgres-password"
       database: bitnami_keycloak
+    image:
+      registry: docker.io
+      repository: bitnami/postgresql
+      tag: "17.4.0-debian-12-r13"
     primary:
       persistence:
         enabled: false # Empheral local storage
