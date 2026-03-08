@@ -1,0 +1,11 @@
+apiVersion: v2
+name: platform-external-secrets
+description: A Helm chart for deploying ESO customized for the IDP Starter Kit
+type: application
+version: 0.1.0
+appVersion: "0.9.13"
+
+dependencies:
+  - name: external-secrets
+    version: 0.9.18
+    repository: https://charts.external-secrets.io

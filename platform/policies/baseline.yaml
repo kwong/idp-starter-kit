@@ -1,0 +1,39 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-labels
+spec:
+  validationFailureAction: Audit # Set to Enforce in production after testing
+  rules:
+  - name: require-env-label
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "The label `env` is required for all pods."
+      pattern:
+        metadata:
+          labels:
+            env: "?*"
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+spec:
+  validationFailureAction: Audit
+  rules:
+  - name: require-image-tag
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "Using the `latest` tag is not permitted. Please specify a fixed version."
+      pattern:
+        spec:
+          containers:
+          - image: "!*:latest"

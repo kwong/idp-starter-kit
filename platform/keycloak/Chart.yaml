@@ -1,0 +1,11 @@
+apiVersion: v2
+name: platform-keycloak
+description: A Helm chart for deploying Keycloak customized for the IDP Starter Kit
+type: application
+version: 0.1.0
+appVersion: "24.0.0"
+
+dependencies:
+  - name: keycloak
+    version: 24.4.2
+    repository: oci://registry-1.docker.io/bitnamicharts

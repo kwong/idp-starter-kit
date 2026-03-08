@@ -1,0 +1,11 @@
+apiVersion: v2
+name: platform-kyverno
+description: A Helm chart for deploying Kyverno customized for the IDP Starter Kit
+type: application
+version: 0.1.0
+appVersion: "1.12.2"
+
+dependencies:
+  - name: kyverno
+    version: 3.2.2
+    repository: https://kyverno.github.io/kyverno/

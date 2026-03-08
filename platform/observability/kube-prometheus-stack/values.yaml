@@ -1,0 +1,31 @@
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+  
+  grafana:
+    enabled: true
+    defaultDashboardsEnabled: true
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - grafana.local
+    # OIDC configuration would go here to connect with Keycloak
+    grafana.ini:
+      server:
+        root_url: http://grafana.local
+      auth.generic_oauth:
+        enabled: true
+        name: Keycloak
+        allow_sign_up: true
+        client_id: grafana
+        # Client Secret normally injected via External Secrets
+        client_secret: dummy-secret
+        scopes: openid email profile roles
+        auth_url: http://keycloak.local/realms/idp/protocol/openid-connect/auth
+        token_url: http://keycloak.local/realms/idp/protocol/openid-connect/token
+        api_url: http://keycloak.local/realms/idp/protocol/openid-connect/userinfo
+        role_attribute_path: contains(roles[*], 'platform-admins') && 'Admin' || 'Viewer'

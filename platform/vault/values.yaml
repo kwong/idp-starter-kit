@@ -1,0 +1,18 @@
+vault:
+  server:
+    # Use dev mode for the local starter kit so it auto-unseals and initializes
+    dev:
+      enabled: true
+      # devRootToken controls the root token to initialize with
+      devRootToken: "root"
+    
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - host: vault.local
+          paths: []
+  
+  ui:
+    enabled: true
+    serviceType: "ClusterIP"

@@ -1,0 +1,11 @@
+tempo:
+  tempo:
+    storage:
+      trace:
+        backend: local
+        local:
+          path: /var/tempo/traces
+    retention: 24h
+  
+  # Deploy in a simplified monolithic structure for the local starter kit
+  deployAsMonolith: true

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+data:
+  # Map the 'platform-admins' OIDC group to ArgoCD's built-in 'role:admin'
+  # Map the 'developers' OIDC group to 'role:readonly'
+  policy.csv: |
+    g, platform-admins, role:admin
+    g, developers, role:readonly
+  # Use the 'roles' claim injected by Keycloak
+  scopes: "[roles, groups]"

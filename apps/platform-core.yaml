@@ -1,0 +1,47 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: "Core IDP components project"
+  # Allow all source repositories for now
+  sourceRepos:
+    - '*'
+  # Allow deploying into all namespaces on the local cluster
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  # Allow all cluster-scoped resources (required for CRDs/Namespaces/ClusterRoles)
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-core
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: platform
+  source:
+    # TODO: Change this to your actual repository URL
+    repoURL: 'https://github.com/kwong/perpetual-sandbox.git'
+    targetRevision: HEAD
+    path: apps/infrastructure
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    # Base namespace, but components usually define their own
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

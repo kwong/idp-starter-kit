@@ -1,0 +1,11 @@
+apiVersion: v2
+name: platform-tempo
+description: A Helm chart for deploying Tempo customized for the IDP Starter Kit
+type: application
+version: 0.1.0
+appVersion: "2.4.1"
+
+dependencies:
+  - name: tempo
+    version: 1.10.1
+    repository: https://grafana.github.io/helm-charts

@@ -1,0 +1,15 @@
+# To test the platform APIs locally after bootstrapping, run:
+# kubectl apply -f hack/demo-xapp.yaml -n default
+# 
+# This will trigger Crossplane to automatically provision a Deployment,
+# Service, and an Ingress mapped to local dev environment.
+
+apiVersion: platform.idp.local/v1alpha1
+kind: App
+metadata:
+  name: test-app
+  namespace: default
+spec:
+  parameters:
+    image: nginx:latest # NOTE: Kyverno policy will flag this tag if applied in Enforce mode!
+    port: 80
