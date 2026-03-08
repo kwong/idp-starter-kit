@@ -1,0 +1,91 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - grafana-oidc-env.yaml
+  - externalsecret-grafana.yaml
+  - externalsecret-vault.yaml
+
+# Populate the grafana-oidc-env bridge ConfigMap placeholders from
+# the canonical oidc-config values defined in configmap.yaml.
+replacements:
+  - source:
+      kind: ConfigMap
+      name: oidc-config
+      fieldPath: data.grafana_client_id
+    targets:
+      - select:
+          kind: ConfigMap
+          name: grafana-oidc-env
+        fieldPaths:
+          - data.GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+        options:
+          delimiter: "GRAFANA_CLIENT_ID"
+
+  - source:
+      kind: ConfigMap
+      name: oidc-config
+      fieldPath: data.oidc_auth_url
+    targets:
+      - select:
+          kind: ConfigMap
+          name: grafana-oidc-env
+        fieldPaths:
+          - data.GF_AUTH_GENERIC_OAUTH_AUTH_URL
+        options:
+          delimiter: "GRAFANA_AUTH_URL"
+
+  - source:
+      kind: ConfigMap
+      name: oidc-config
+      fieldPath: data.oidc_token_url
+    targets:
+      - select:
+          kind: ConfigMap
+          name: grafana-oidc-env
+        fieldPaths:
+          - data.GF_AUTH_GENERIC_OAUTH_TOKEN_URL
+        options:
+          delimiter: "GRAFANA_TOKEN_URL"
+
+  - source:
+      kind: ConfigMap
+      name: oidc-config
+      fieldPath: data.oidc_api_url
+    targets:
+      - select:
+          kind: ConfigMap
+          name: grafana-oidc-env
+        fieldPaths:
+          - data.GF_AUTH_GENERIC_OAUTH_API_URL
+        options:
+          delimiter: "GRAFANA_API_URL"
+
+  - source:
+      kind: ConfigMap
+      name: oidc-config
+      fieldPath: data.groups_claim
+    targets:
+      - select:
+          kind: ConfigMap
+          name: grafana-oidc-env
+        fieldPaths:
+          - data.GF_AUTH_GENERIC_OAUTH_SCOPES
+          - data.GF_AUTH_GENERIC_OAUTH_GROUPS_CLAIM
+        options:
+          delimiter: "GRAFANA_GROUPS_CLAIM"
+
+  - source:
+      kind: ConfigMap
+      name: oidc-config
+      fieldPath: data.rbac_admin_group
+    targets:
+      - select:
+          kind: ConfigMap
+          name: grafana-oidc-env
+        fieldPaths:
+          - data.GF_AUTH_GENERIC_OAUTH_ADMIN_GROUP
+        options:
+          delimiter: "GRAFANA_ADMIN_GROUP"

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: infrastructure-apps
+description: The root App of Apps for the IDP Starter Kit infrastructure components
+type: application
+version: 0.1.0

@@ -1,0 +1,24 @@
+# grafana-oidc-env ConfigMap
+# ---------------------------------------------------------------------------
+# Exposes oidc-config values as environment variable names that Grafana's
+# generic_oauth plugin understands via the $__env{VAR} interpolation syntax.
+# This ConfigMap is created in the monitoring namespace alongside Grafana.
+#
+# Source of truth: platform/oidc-config/configmap.yaml
+# This file should not be edited directly — it is generated from oidc-config
+# via a Kustomize replacement in platform/observability/kube-prometheus-stack/kustomization.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-oidc-env
+  namespace: monitoring
+data:
+  # Populated via Kustomize replacement from oidc-config ConfigMap values.
+  # Placeholders below are replaced at kustomize build time.
+  GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "GRAFANA_CLIENT_ID"
+  GF_AUTH_GENERIC_OAUTH_AUTH_URL:  "GRAFANA_AUTH_URL"
+  GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "GRAFANA_TOKEN_URL"
+  GF_AUTH_GENERIC_OAUTH_API_URL:   "GRAFANA_API_URL"
+  GF_AUTH_GENERIC_OAUTH_SCOPES:    "GRAFANA_GROUPS_CLAIM"
+  GF_AUTH_GENERIC_OAUTH_GROUPS_CLAIM: "GRAFANA_GROUPS_CLAIM"
+  GF_AUTH_GENERIC_OAUTH_ADMIN_GROUP:  "GRAFANA_ADMIN_GROUP"

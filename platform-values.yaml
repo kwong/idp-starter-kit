@@ -1,0 +1,78 @@
+# =============================================================================
+# IDP Starter Kit — Platform Configuration
+# =============================================================================
+# This is the single source-of-truth for platform-wide settings.
+# Edit this file to configure your IdP and Vault unseal strategy.
+# This file does NOT contain secrets. Secrets are stored in Vault KV.
+# =============================================================================
+
+identity-provider:
+  # -------------------------------------------------------------------------
+  # IdP Mode:
+  #   "internal" → Deploy Keycloak inside the cluster and auto-wire all
+  #                components to it. Best for fresh environments with no
+  #                existing SSO infrastructure.
+  #   "external" → Skip deploying Keycloak. Point all components at an
+  #                existing OIDC-compliant IdP (Entra ID, GitHub, Google,
+  #                Okta, an existing Keycloak, etc.).
+  # -------------------------------------------------------------------------
+  mode: internal
+
+  # Required when mode=external.
+  # Must be the OIDC discovery base URL (the /.well-known/openid-configuration
+  # endpoint must exist at <issuer_url>/.well-known/openid-configuration).
+  # Examples:
+  #   Entra ID: https://login.microsoftonline.com/<tenant-id>/v2.0
+  #   GitHub:   https://token.actions.githubusercontent.com  (Actions only)
+  #   Google:   https://accounts.google.com
+  #   Okta:     https://<your-domain>.okta.com
+  #   Keycloak: https://sso.example.com/realms/<realm>
+  issuer_url: ""
+
+  # The JWT claim that carries group/role membership.
+  # This controls RBAC mappings across ArgoCD, Grafana, and Vault.
+  # Keycloak (with groups mapper): "roles"
+  # GitHub:                        "teams"
+  # Entra ID / Okta / Google:      "groups"
+  groups_claim: "roles"
+
+  # -------------------------------------------------------------------------
+  # OIDC Client IDs (secrets are stored in Vault KV, not here)
+  # Vault KV paths:
+  #   Grafana client secret → secret/identity-provider/grafana  (key: client_secret)
+  #   Vault OIDC secret     → secret/identity-provider/vault    (key: client_secret)
+  # ArgoCD is configured as a public client (no secret required).
+  # -------------------------------------------------------------------------
+  clients:
+    argocd:
+      client_id: "argocd"
+    grafana:
+      client_id: "grafana"
+    vault:
+      client_id: "vault"
+
+# =============================================================================
+
+vault:
+  unseal:
+    # -------------------------------------------------------------------------
+    # Unseal Mode:
+    #   "dev" → Vault dev mode. Ephemeral, auto-unseals, root token is printed
+    #           to pod stdout only. FOR LOCAL KIND CLUSTERS ONLY.
+    #   "kms" → Cloud KMS auto-unseal. Vault initialises with key shares that
+    #           are immediately encrypted by the KMS key. No unseal key or root
+    #           token is ever stored in Git or Kubernetes Secrets.
+    #           Requires awsKmsKeyId OR gcpKmsCryptoKey below.
+    # -------------------------------------------------------------------------
+    mode: dev
+
+    # AWS KMS auto-unseal (mode=kms on EKS)
+    # awsKmsKeyId: "arn:aws:kms:us-east-1:123456789012:key/mrk-xxxxxxxx"
+    # awsRegion: "us-east-1"
+
+    # GCP KMS auto-unseal (mode=kms on GKE)
+    # gcpKmsCryptoKey: "projects/my-project/locations/global/keyRings/vault/cryptoKeys/vault-unseal"
+    # gcpKmsProject: "my-project"
+    # gcpKmsRegion: "global"
+    # gcpKmsKeyRing: "vault"
+    # gcpKmsKeyName: "vault-unseal"

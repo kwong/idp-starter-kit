@@ -1,3 +1,4 @@
+{{- if eq (index .Values "identity-provider" "mode") "internal" }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -21,3 +22,5 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+{{- end }}
+

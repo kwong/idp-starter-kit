@@ -9,6 +9,7 @@ Thumbs.db
 
 # Kubernetes & Local Development
 kubeconfig
+.kubeconfig
 .kube/
 *.pem
 *.crt

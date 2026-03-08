@@ -80,3 +80,8 @@ To bridge this starter kit into production:
 4. **Deploy the App of Apps**: Terraform applies the root `apps/platform-core.yaml` manifest.
 
 At this point, Terraform is finished. ArgoCD connects to the Git repository, reads the `platform/` manifests, and seamlessly deploys Keycloak, Vault, Crossplane, and the Observability stack in the exact identical configuration as the local `kind` cluster.
+
+
+# Multi Agent Safety
+- When you see unrecognized files just keep going, focus only on files that you recognize.
+- When a user asks to push changes to git,, run `git pull --rebase` to integrate latest changes

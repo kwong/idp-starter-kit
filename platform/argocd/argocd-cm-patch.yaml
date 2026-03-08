@@ -8,11 +8,16 @@ metadata:
     app.kubernetes.io/part-of: argocd
 data:
   url: "https://argocd.local"
+  # OIDC config is injected via Kustomize replacements from the oidc-config ConfigMap.
+  # Source of truth: platform/oidc-config/configmap.yaml
+  # To change the IdP, update platform-values.yaml — do NOT edit URLs here directly.
   oidc.config: |
-    name: Keycloak
-    issuer: http://keycloak.keycloak.svc.cluster.local:80/realms/idp
-    clientID: argocd
-    # Client secret is dummy or empty for public clients
+    name: SSO
+    issuer: ARGOCD_OIDC_ISSUER_URL
+    clientID: ARGOCD_OIDC_CLIENT_ID
+    # ArgoCD is configured as a public OIDC client (no client secret required).
+    # If your IdP requires a confidential client, store the secret in Vault KV
+    # at secret/identity-provider/argocd and add an ExternalSecret in platform/oidc-config/.
     clientSecret: ""
-    requestedScopes: ["openid", "profile", "email", "groups"]
-    logoutURL: http://keycloak.local/realms/idp/protocol/openid-connect/logout
+    requestedScopes: ["openid", "profile", "email", "ARGOCD_OIDC_GROUPS_CLAIM"]
+    logoutURL: ARGOCD_OIDC_LOGOUT_URL

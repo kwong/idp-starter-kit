@@ -32,8 +32,9 @@ spec:
     repoURL: 'https://github.com/kwong/idp-starter-kit.git'
     targetRevision: HEAD
     path: apps/infrastructure
-    directory:
-      recurse: true
+    helm:
+      valueFiles:
+        - ../../platform-values.yaml
   destination:
     server: https://kubernetes.default.svc
     # Base namespace, but components usually define their own
