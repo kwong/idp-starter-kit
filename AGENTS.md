@@ -9,7 +9,7 @@ The goal of this starter kit is to allow platform engineers to rapidly deploy a 
 1. **GitOps First:** All platform state is declared in version control. The cluster state strictly matches the Git state via ArgoCD.
 2. **Modular Architecture:** Platform components are separated into discrete functional blocks (Apps) allowing teams to easily swap or remove pieces (e.g., swapping Kyverno for Gatekeeper, or Vault for AWS Secrets Manager).
 3. **Local-First Development:** The entire IDP can be spun up locally on a developer's machine using `kind` (Kubernetes in Docker) to validate changes before pushing them centrally.
-4. **Secure by Default:** Secrets are never hardcoded or pushed to git in plaintext. OIDC-driven RBAC is enabled for all platform UI surfaces. Policies enforce secure resource configuration.
+4. **Secure by Default:** Secrets are never hardcoded or pushed to git in plaintext or encoded format. OIDC-driven RBAC is enabled for all platform UI surfaces. Policies enforce secure resource configuration.
 
 ## Directory Structure
 
