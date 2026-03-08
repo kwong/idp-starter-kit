@@ -3,10 +3,5 @@ kind: Kustomization
 
 resources:
   - ingress.yaml
-  # In a real environment, we would point to the upstream manifests here too
-  # github.com/argoproj/argo-cd/manifests/ha/cluster-install?ref=v2.10.1
-  # But since hack/setup.sh installs it, we just patch the existing ConfigMaps
-
-patches:
-  - path: argocd-cm-patch.yaml
-  - path: argocd-rbac-cm-patch.yaml
+  - argocd-cm-patch.yaml
+  - argocd-rbac-cm-patch.yaml
