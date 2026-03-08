@@ -18,3 +18,18 @@ spec:
     automated:
       prune: true
       selfHeal: true
+  helm:
+    parameters:
+      - name: server.config.url
+        value: "https://argocd.local"
+      - name: server.config.oidc\.config
+        value: |
+          name: SSO
+          issuer: {{ .Values.identity_provider.issuer_url | default "http://keycloak.keycloak.svc.cluster.local:80/realms/idp" }}
+          clientID: {{ .Values.identity_provider.clients.argocd.client_id }}
+          requestedScopes: ["openid", "profile", "email", "{{ .Values.identity_provider.groups_claim }}"]
+          logoutURL: {{ if eq .Values.identity_provider.mode "internal" }}"http://keycloak.local/realms/idp/protocol/openid-connect/logout"{{ else }}""{{ end }}
+      - name: server.rbacConfig.policy\.csv
+        value: |
+          g, {{ .Values.identity_provider.groups_claim | default "roles" }}:platform-admins, role:admin
+          g, {{ .Values.identity_provider.groups_claim | default "roles" }}:developers, role:readonly
