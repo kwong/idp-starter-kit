@@ -1,46 +1,55 @@
-keycloak:
-  auth:
-    adminUser: admin
-    # In production, use External Secrets to populate this
-    adminPassword: admin
-  image:
-    registry: quay.io
-    repository: keycloak/keycloak
-    tag: "26.3.3"
-    pullPolicy: IfNotPresent
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    hostname: keycloak.local
-    pathType: Prefix
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
-  production: false # For local kind cluster testing
-  proxy: edge
+keycloakx:
+  # Admin credentials
+  args:
+    - start
+    - --import-realm
   
-  extraEnvVars:
-    - name: KEYCLOAK_EXTRA_ARGS
-      value: "--import-realm"
+  env:
+    - name: KEYCLOAK_ADMIN
+      value: "admin"
+    - name: KEYCLOAK_ADMIN_PASSWORD
+      value: "admin"
+    - name: KC_PROXY
+      value: "edge"
+    - name: KC_HTTP_ENABLED
+      value: "true"
+    - name: KC_HOSTNAME_STRICT
+      value: "false"
+    - name: KC_HOSTNAME
+      value: "keycloak.local"
+    # Database connection
+    - name: KC_DB
+      value: "postgres"
+    - name: KC_DB_URL
+      value: "jdbc:postgresql://keycloak-postgresql:5432/keycloak"
+    - name: KC_DB_USERNAME
+      value: "keycloak"
+    - name: KC_DB_PASSWORD
+      value: "postgres-password"
 
-  extraVolumes:
+  extraVolumes: |
     - name: keycloak-realm
       configMap:
         name: keycloak-realm
 
-  extraVolumeMounts:
+  extraVolumeMounts: |
     - name: keycloak-realm
-      mountPath: "/opt/bitnami/keycloak/data/import"
+      mountPath: /opt/keycloak/data/import
       readOnly: true
 
-  postgresql:
-    auth:
-      username: bn_keycloak
-      password: "postgres-password"
-      database: bitnami_keycloak
-    image:
-      registry: docker.io
-      repository: bitnami/postgresql
-      tag: "17.4.0-debian-12-r13"
-    primary:
-      persistence:
-        enabled: false # Empheral local storage
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    rules:
+      - host: keycloak.local
+        paths:
+          - path: /
+            pathType: Prefix
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+
+  # Disable bundled infinispan
+  affinity: ""
+
+# Deploy PostgreSQL separately using bitnami/postgresql community chart
+# This is a separate release managed outside of keycloakx

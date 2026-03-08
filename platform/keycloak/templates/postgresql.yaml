@@ -1,0 +1,67 @@
+---
+# Standalone PostgreSQL for Keycloak (since keycloakx chart doesn't bundle one)
+# Using official postgres image which is publicly available on Docker Hub
+apiVersion: v1
+kind: Secret
+metadata:
+  name: keycloak-postgresql-secret
+  namespace: keycloak
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "postgres-password"
+  POSTGRES_USER: "keycloak"
+  POSTGRES_DB: "keycloak"
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: keycloak-postgresql
+  namespace: keycloak
+  labels:
+    app: keycloak-postgresql
+spec:
+  serviceName: keycloak-postgresql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak-postgresql
+  template:
+    metadata:
+      labels:
+        app: keycloak-postgresql
+        env: local
+    spec:
+      containers:
+        - name: postgresql
+          image: docker.io/library/postgres:17
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: keycloak-postgresql-secret
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "keycloak", "-d", "keycloak"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 5
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: data
+      volumes:
+        - name: data
+          emptyDir: {}  # Ephemeral for local dev
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-postgresql
+  namespace: keycloak
+spec:
+  selector:
+    app: keycloak-postgresql
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+      name: postgres
