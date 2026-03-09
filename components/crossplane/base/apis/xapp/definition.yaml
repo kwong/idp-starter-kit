@@ -11,25 +11,25 @@ spec:
     kind: App
     plural: apps
   versions:
-  - name: v1alpha1
-    served: true
-    referenceable: true
-    schema:
-      openAPIV3Schema:
-        type: object
-        properties:
-          spec:
-            type: object
-            properties:
-              parameters:
-                type: object
-                properties:
-                  image:
-                    type: string
-                    description: "Container image to deploy"
-                  port:
-                    type: integer
-                    description: "Container port to expose"
-                required:
-                - image
-                - port
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  properties:
+                    image:
+                      type: string
+                      description: "Container image to deploy"
+                    port:
+                      type: integer
+                      description: "Container port to expose"
+                  required:
+                    - image
+                    - port

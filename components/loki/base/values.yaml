@@ -11,5 +11,7 @@ read:
   replicas: 0
 write:
   replicas: 0
-backend:
-  replicas: 0
+
+# Disable Helm test pods which often use 'latest' tags
+test:
+  enabled: false

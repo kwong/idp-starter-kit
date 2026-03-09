@@ -8,3 +8,8 @@ tempo:
 
 # Deploy in a simplified monolithic structure for the local starter kit
 deployAsMonolith: true
+
+# Disable Helm test pods which often use 'latest' tags
+tempo:
+  test:
+    enabled: false

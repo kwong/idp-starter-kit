@@ -89,7 +89,7 @@ components:
   argocd: true
   oidc-configuration: true
   policies: true
-  
+
   # Optional / Toggleable modules
   crossplane: true
   external-secrets: true
