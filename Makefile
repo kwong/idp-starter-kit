@@ -8,8 +8,8 @@ cluster: ## Create the local kind cluster and install Ingress
 	@bash hack/setup.sh
 
 bootstrap: ## Apply the root ArgoCD application to start GitOps
-	@echo "Applying Root GitOps Application..."
-	@kubectl apply -f apps/platform-core.yaml
+	@echo "Applying dev environment bootstrap..."
+	@kubectl apply -f bootstrap/dev.yaml
 
 up: cluster bootstrap ## Spin up everything (cluster + GitOps bootstrap)
 	@echo "Started the complete setup process."

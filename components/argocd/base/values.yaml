@@ -1,0 +1,19 @@
+server:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - argocd.local
+    paths:
+      - /
+  
+  config:
+    url: "https://argocd.local"
+
+configs:
+  params:
+    server.insecure: true
+  cm:
+    # Allow Kustomize to pull upstream Helm charts when rendering applications
+    # that use helmCharts: in their kustomization.yaml (all platform/ modules)
+    kustomize.helm.enabled: "true"

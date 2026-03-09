@@ -15,9 +15,12 @@ This starter kit provisions the following platform capabilities:
 ## Repository Layout
 
 * `AGENTS.md`: Full architectural design document.
-* `apps/`: The ArgoCD root applications ("App of Apps") managing the platform components.
-* `platform/`: Kustomize & Helm values for the individual platform tools.
-* `hack/`: Local development tools, scripts, and demo payloads.
+* `bootstrap/`: ArgoCD Applications ("App of Apps") that point to environments.
+* `environments/`: Kustomize overlays that aggregate platform components for a specific environment.
+* `components/`: "The Lego Bricks". Reusable base definitions for platform tools.
+* `hack/`: Local development tools, scripts, and demo payloads strictly for `kind` testing.
+* `./scaffold-env.sh`: Generates new environments based on `platform-values.yaml`.
+* `./seed-vault-secrets.sh`: Seeds OIDC secrets into Vault KV for any environment.
 
 ## Quick Start (Local Run)
 

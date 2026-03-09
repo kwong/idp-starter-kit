@@ -37,11 +37,10 @@ kubectl wait --namespace argocd \
   --selector=app.kubernetes.io/name=argocd-server \
   --timeout=120s
 
-# 5. Phase 0: Local Vault Bootstrap
+# 5. Phase 0: Local Vault Bootstrap (via Kustomize + Helm)
 echo "--> Phase 0: Deploying Vault for local dev token extraction..."
-helm repo add hashicorp https://helm.releases.hashicorp.com 2>/dev/null || true
-helm dependency update platform/vault 2>/dev/null || true
-helm upgrade --install vault platform/vault -n vault --create-namespace -f platform/vault/values.yaml
+kubectl create namespace vault --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply --server-side --force-conflicts -k components/vault/base/
 
 echo "--> Waiting for Vault to be ready..."
 kubectl wait --namespace vault \
@@ -59,24 +58,22 @@ echo "Dev Root Token retrieved successfully."
 
 export VAULT_ADDR="http://127.0.0.1:8200"
 echo "--> Port-forwarding Vault locally on 8200..."
-kubectl port-forward -n vault svc/vault 8200:8200 >/dev/null 2>&1 &
+kubectl port-forward -n vault svc/vault 8200:8200 > /dev/null 2>&1 &
 PF_PID=$!
 sleep 5
 
 # Seed the OIDC secrets locally via the helper script
-chmod +x hack/seed-vault-secrets.sh
-./hack/seed-vault-secrets.sh
+chmod +x ./seed-vault-secrets.sh
+./seed-vault-secrets.sh
 
 # Kill the port-forward
 kill $PF_PID
 
 # 6. Apply the Root App of Apps
-echo "--> Applying Root GitOps Application..."
-# Create the apps directory if it doesn't exist
-mkdir -p apps
-# We will apply apps/platform-core.yaml here 
-# kubectl apply -f apps/platform-core.yaml
+echo "--> Applying dev environment bootstrap Application..."
+kubectl apply -f bootstrap/dev.yaml
 
 echo ""
 echo "==> Bootstrap Complete!"
-echo "ArgoCD will begin synchronising components once apps/platform-core.yaml is created."
+echo "ArgoCD will begin synchronising platform components from Git."
+echo "Track progress at: http://argocd.local"

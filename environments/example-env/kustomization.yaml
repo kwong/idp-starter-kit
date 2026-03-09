@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Template overlay for a new environment.
+# Copy this directory, rename it, and add environment-specific patches below.
+resources:
+  # Identity & Access
+  - ../../components/argocd/base
+  - ../../components/keycloak/base
+  - ../../components/external-secrets/base
+  - ../../components/oidc-configuration/base
+
+  # Policy Engine
+  - ../../components/kyverno/base
+  - ../../components/policies/base
+
+  # Control Plane
+  - ../../components/crossplane/base
+
+  # Secrets Backend
+  - ../../components/vault/base
+
+  # Observability Stack
+  - ../../components/kube-prometheus-stack/base
+  - ../../components/loki/base
+  - ../../components/tempo/base
+  - ../../components/otel-collector/base
+
+# Add environment-specific Helm value patches here, e.g.:
+# patches:
+#   - target:
+#       kind: HelmChart
+#       name: vault
+#     patch: |-
+#       - op: replace
+#         path: /spec/valuesFile
+#         value: vault-values.yaml

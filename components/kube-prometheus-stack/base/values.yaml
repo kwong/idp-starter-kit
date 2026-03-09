@@ -1,0 +1,42 @@
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+grafana:
+  enabled: true
+  defaultDashboardsEnabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.local
+
+  envFromSecret: "grafana-oidc-secret"
+
+  # Pull IdP endpoint URLs from the shared oidc-config ConfigMap.
+  # This decouples Grafana from any specific IdP — changing the IdP only
+  # requires updating platform/oidc-config/configmap.yaml (via platform-values.yaml).
+  envFromConfigMaps:
+    - name: grafana-oidc-env
+
+  grafana.ini:
+    server:
+      root_url: http://grafana.local
+    auth.generic_oauth:
+      enabled: true
+      # Name shown on the Grafana login button (e.g. "Keycloak", "Microsoft", "GitHub")
+      name: SSO
+      allow_sign_up: true
+      # client_id is sourced from the oidc-config ConfigMap via GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+      client_id: $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_ID}
+      # client_secret is sourced from grafana-oidc-secret via GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+      scopes: openid email profile $__env{GF_AUTH_GENERIC_OAUTH_SCOPES}
+      auth_url: $__env{GF_AUTH_GENERIC_OAUTH_AUTH_URL}
+      token_url: $__env{GF_AUTH_GENERIC_OAUTH_TOKEN_URL}
+      api_url: $__env{GF_AUTH_GENERIC_OAUTH_API_URL}
+      # Role mapping: admin group gets Admin, everyone else gets Viewer.
+      # The claim name and admin group name are sourced from oidc-config.
+      role_attribute_path: >-
+        contains($__env{GF_AUTH_GENERIC_OAUTH_GROUPS_CLAIM}[*], '$__env{GF_AUTH_GENERIC_OAUTH_ADMIN_GROUP}') && 'Admin' || 'Viewer'

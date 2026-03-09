@@ -10,37 +10,94 @@ The goal of this starter kit is to allow platform engineers to rapidly deploy a 
 2. **Modular Architecture:** Platform components are separated into discrete functional blocks (Apps) allowing teams to easily swap or remove pieces (e.g., swapping Kyverno for Gatekeeper, or Vault for AWS Secrets Manager).
 3. **Local-First Development:** The entire IDP can be spun up locally on a developer's machine using `kind` (Kubernetes in Docker) to validate changes before pushing them centrally.
 4. **Secure by Default:** Secrets are never hardcoded or pushed to git in plaintext or encoded format. OIDC-driven RBAC is enabled for all platform UI surfaces. Policies enforce secure resource configuration.
+5. **Core logic in Helm, Environment overrides in Kustomize:** The core logic of the IDP is implemented in  Helm charts, with environment-specific overrides in Kustomize. This allows for a consistent baseline of the IDP across different environments.
 
-## Directory Structure
+## Project Structure
 
 To maintain a clean separation of concerns, the repository is structured as follows:
 
+- `bootstrap/`: The "Root" App-of-Apps
+- `components/*`: "The Lego Bricks" (Base Definitions)
+- `components/*/base/`: Kustomization + Remote Helm reference
+- `components/*/crossplane/providers/`: Provider-specific configs
+- `environments/*`: Kustomize environment-specific overrides. it should include a dev
+
+### Example
 ```text
 idp-starter-kit/
-├── AGENTS.md                 # Project architecture and design guidelines
-├── Makefile                  # Core orchestrator commands (e.g., make up, make test)
-├── apps/                     # ArgoCD Application definitions ("App of Apps")
-│   ├── platform-core.yaml    # Bootstraps infrastructure components
-│   └── observability.yaml    # Bootstraps metrics/logs/traces components
-├── bootstrap/                # Initial cluster-bridging configuration (GitOps ingress rules, repo secrets)
-├── hack/                     # Local test scripts, kind-configs, and ad-hoc troubleshooting tooling
-│   ├── kind-config.yaml      # Configuration for local Kind cluster
-│   └── setup.sh              # Bash orchestration to bootstrap raw resources
-└── platform/                 # Core manifest configurations (wrapped Helm charts / Kustomize)
-    ├── crossplane/           # Control Plane + Provider configurations
-    │   └── apis/             # Crossplane XRDs and Compositions modeling the internal Developer API
-    ├── external-secrets/     # ESO and ClusterSecretStore configurations
-    ├── keycloak/             # Local OIDC IdP Deployment and baseline Realm Configurations
-    ├── kyverno/              # Policy engine and foundational ClusterPolicies
-    ├── observability/        # LGTM stack components (Prometheus, Loki, Tempo, Grafana, Otel)
-    └── vault/                # Secrets engine backend configurations
+├── bootstrap/                   
+│   ├── env.yaml.example            # Example environment config for ArgoCD App pointing to /environments/example-env
+│   └── dev.yaml                # ArgoCD App pointing to /environments/prod
+├── components/                  
+│   ├── crossplane/
+│   │   ├── base/                # Kustomization + Remote Helm reference
+│   │   └── providers/           # Crossplane specific configs
+│   ├── vault/
+│   │   └── base/                # Official Hashicorp Helm + Enterprise configs
+│   └── argocd/
+│   │   ├── base/                # Kustomization + Remote Helm reference
+│   ├── prometheus/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   └── grafana/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   ├── loki/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   ├── otel-collector/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   ├── tempo/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   └── oidc-configuration/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   ├── policies/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   ├── kyverno/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   ├── keycloak/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   ├── external-secrets/
+│   │   └── base/                # Kustomization + Remote Helm reference
+│   └── kube-prometheus-stack/
+│   │   └── base/                # Kustomization + Remote Helm reference
+
+└── environments/                # "The Instruction Manual" (Overrides)
+    ├── example-env/
+    │   ├── kustomization.yaml   # Aggregates components for Example Env
+    │   ├── crossplane-values.yaml
+    │   └── vault-values.yaml
+    │   ├── argocd-values.yaml
+    │   ├── prometheus-values.yaml
+    │   ├── grafana-values.yaml
+    │   ├── loki-values.yaml
+    │   ├── otel-collector-values.yaml
+    │   ├── tempo-values.yaml
+    │   ├── oidc-configuration-values.yaml
+    │   ├── policies-values.yaml
+    │   ├── kyverno-values.yaml
+    │   ├── keycloak-values.yaml
+    │   ├── external-secrets-values.yaml
+    │   └── kube-prometheus-stack-values.yaml
+    └── dev/
+        ├── kustomization.yaml   # Aggregates components for Dev Env
+        ├── crossplane-values.yaml
+        ├── vault-values.yaml
+        ├── argocd-values.yaml
+        ├── prometheus-values.yaml
+        ├── grafana-values.yaml
+        ├── loki-values.yaml
+        ├── otel-collector-values.yaml
+        ├── tempo-values.yaml
+        ├── oidc-configuration-values.yaml
+        ├── policies-values.yaml
+        ├── kyverno-values.yaml
+        ├── keycloak-values.yaml
+        ├── external-secrets-values.yaml
+        └── kube-prometheus-stack-values.yaml
 ```
 
-### Module Organization Patterns
-
-* Every tool inside `platform/` is self-contained. For external Helm charts, we use `kustomization.yaml` files alongside Helm Overrides (`values.yaml`) rather than downloading chart templates locally. 
-* ArgoCD `Application` objects (inside `apps/`) point inward to these `platform/` directories.
-* Development scripts (`hack/`) act purely as quality-of-life wrappers around standard CLI tools (`kubectl`, `argocd`, `helm`) and are not required for production deployment.
+* Every tool inside `components/` is self-contained. For external Helm charts, we use `kustomization.yaml` files alongside Helm Overrides (`values.yaml`) rather than downloading chart templates locally. 
+* ArgoCD `Application` objects (inside `bootstrap/`) point inward to the `environments/` directories.
+* Development scripts inside `hack/` act purely as quality-of-life wrappers for local `kind` development and are explicitly **not** required for production deployment.
+* Scripts used for deploying or configuring actual environments (e.g. `scaffold-env.sh`, `seed-vault-secrets.sh`) live at the repository root.
 
 ## Test & Development Strategy
 

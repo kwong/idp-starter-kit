@@ -16,6 +16,9 @@ kubeconfig
 *.key
 *.csr
 
+# Kustomize Helm build artifacts (auto-downloaded by kustomize --enable-helm)
+**/charts/
+
 # Editor directories and files
 .idea
 .vscode

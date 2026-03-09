@@ -76,3 +76,27 @@ vault:
     # gcpKmsRegion: "global"
     # gcpKmsKeyRing: "vault"
     # gcpKmsKeyName: "vault-unseal"
+
+# =============================================================================
+# Platform Components & Environments Scaffold Configuration
+# =============================================================================
+# Used by ./scaffold-env.sh to generate environments/ and bootstrap/ configs.
+environments:
+  - dev
+
+components:
+  # Core infrastructure (always required for the platform to function)
+  argocd: true
+  oidc-configuration: true
+  policies: true
+  
+  # Optional / Toggleable modules
+  crossplane: true
+  external-secrets: true
+  kube-prometheus-stack: true
+  kyverno: true
+  loki: true
+  otel-collector: true
+  tempo: true
+  vault: true
+  # Note: Keycloak is automatically deployed when identity-provider.mode == internal 

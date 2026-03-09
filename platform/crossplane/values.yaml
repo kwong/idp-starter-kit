@@ -1,7 +1,0 @@
-crossplane:
-  metrics:
-    enabled: true
-  provider:
-    packages:
-      # Installs the kubernetes provider out of the box for local demo APIs
-      - xpkg.upbound.io/crossplane-contrib/provider-kubernetes:v0.12.1

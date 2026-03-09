@@ -1,0 +1,3 @@
+# tempo environment-specific Helm value overrides for dev.
+# These patches are applied on top of components/tempo/base/values.yaml.
+# See https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/ for syntax.

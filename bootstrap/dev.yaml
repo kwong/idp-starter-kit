@@ -1,0 +1,47 @@
+---
+# Bootstrap Application for the local 'dev' environment.
+# Applied once during setup: kubectl apply -f bootstrap/dev.yaml
+# ArgoCD then self-manages everything else from Git.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: "Core IDP platform components"
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: idp-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: platform
+  source:
+    # TODO: Change this to your actual repository URL
+    repoURL: 'https://github.com/kwong/idp-starter-kit.git'
+    targetRevision: HEAD
+    # The dev environment overlay aggregates all platform components
+    path: environments/dev
+    kustomize:
+      enableHelm: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Dev environment overlay — aggregates all platform components.
+# ArgoCD's 'idp-dev' Application (bootstrap/dev.yaml) points here.
+resources:
+  # Identity & Access
+  - ../../components/argocd/base
+  - ../../components/keycloak/base
+  - ../../components/external-secrets/base
+  - ../../components/oidc-configuration/base
+
+  # Policy Engine
+  - ../../components/kyverno/base
+  - ../../components/policies/base
+
+  # Control Plane
+  - ../../components/crossplane/base
+
+  # Secrets Backend
+  - ../../components/vault/base
+
+  # Observability Stack
+  - ../../components/kube-prometheus-stack/base
+  - ../../components/loki/base
+  - ../../components/tempo/base
+  - ../../components/otel-collector/base
