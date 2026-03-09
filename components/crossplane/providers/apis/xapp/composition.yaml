@@ -9,127 +9,127 @@ spec:
     apiVersion: platform.idp.local/v1alpha1
     kind: XApp
   resources:
-  - name: deployment
-    base:
-      apiVersion: kubernetes.crossplane.io/v1alpha2
-      kind: Object
-      spec:
-        forProvider:
-          manifest:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: app-deployment
-              labels:
-                env: dev # Satisfies Kyverno policy
-            spec:
-              replicas: 1
-              selector:
-                matchLabels:
-                  app: template
-              template:
-                metadata:
-                  labels:
+    - name: deployment
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha2
+        kind: Object
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: app-deployment
+                labels:
+                  env: dev  # Satisfies Kyverno policy
+              spec:
+                replicas: 1
+                selector:
+                  matchLabels:
                     app: template
-                    env: dev # Satisfies Kyverno policy
-                spec:
-                  containers:
-                  - name: main
-                    image: nginx:1.25.0 # Updated dynamically
-                    ports:
-                    - containerPort: 80 # Updated dynamically
-    patches:
-    - fromFieldPath: "metadata.uid"
-      toFieldPath: "spec.forProvider.manifest.metadata.name"
-      transforms:
-      - type: string
-        string:
-          fmt: "%s-deploy"
-    - fromFieldPath: "metadata.uid"
-      toFieldPath: "spec.forProvider.manifest.spec.selector.matchLabels.app"
-    - fromFieldPath: "metadata.uid"
-      toFieldPath: "spec.forProvider.manifest.spec.template.metadata.labels.app"
-    - fromFieldPath: "spec.parameters.image"
-      toFieldPath: "spec.forProvider.manifest.spec.template.spec.containers[0].image"
-    - fromFieldPath: "spec.parameters.port"
-      toFieldPath: "spec.forProvider.manifest.spec.template.spec.containers[0].ports[0].containerPort"
-    - fromFieldPath: "metadata.labels[crossplane.io/claim-namespace]"
-      toFieldPath: "spec.forProvider.manifest.metadata.namespace"
+                template:
+                  metadata:
+                    labels:
+                      app: template
+                      env: dev  # Satisfies Kyverno policy
+                  spec:
+                    containers:
+                      - name: main
+                        image: nginx:1.25.0  # Updated dynamically
+                        ports:
+                          - containerPort: 80  # Updated dynamically
+      patches:
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.forProvider.manifest.metadata.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-deploy"
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.forProvider.manifest.spec.selector.matchLabels.app"
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.forProvider.manifest.spec.template.metadata.labels.app"
+        - fromFieldPath: "spec.parameters.image"
+          toFieldPath: "spec.forProvider.manifest.spec.template.spec.containers[0].image"
+        - fromFieldPath: "spec.parameters.port"
+          toFieldPath: "spec.forProvider.manifest.spec.template.spec.containers[0].ports[0].containerPort"
+        - fromFieldPath: "metadata.labels[crossplane.io/claim-namespace]"
+          toFieldPath: "spec.forProvider.manifest.metadata.namespace"
 
-  - name: service
-    base:
-      apiVersion: kubernetes.crossplane.io/v1alpha2
-      kind: Object
-      spec:
-        forProvider:
-          manifest:
-            apiVersion: v1
-            kind: Service
-            metadata:
-              name: app-service
-            spec:
-              selector:
-                app: template
-              ports:
-              - port: 80
-                targetPort: 80
-    patches:
-    - fromFieldPath: "metadata.uid"
-      toFieldPath: "spec.forProvider.manifest.metadata.name"
-      transforms:
-      - type: string
-        string:
-          fmt: "%s-svc"
-    - fromFieldPath: "metadata.uid"
-      toFieldPath: "spec.forProvider.manifest.spec.selector.app"
-    - fromFieldPath: "spec.parameters.port"
-      toFieldPath: "spec.forProvider.manifest.spec.ports[0].targetPort"
-    - fromFieldPath: "metadata.labels[crossplane.io/claim-namespace]"
-      toFieldPath: "spec.forProvider.manifest.metadata.namespace"
+    - name: service
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha2
+        kind: Object
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: v1
+              kind: Service
+              metadata:
+                name: app-service
+              spec:
+                selector:
+                  app: template
+                ports:
+                  - port: 80
+                    targetPort: 80
+      patches:
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.forProvider.manifest.metadata.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-svc"
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.forProvider.manifest.spec.selector.app"
+        - fromFieldPath: "spec.parameters.port"
+          toFieldPath: "spec.forProvider.manifest.spec.ports[0].targetPort"
+        - fromFieldPath: "metadata.labels[crossplane.io/claim-namespace]"
+          toFieldPath: "spec.forProvider.manifest.metadata.namespace"
 
-  - name: ingress
-    base:
-      apiVersion: kubernetes.crossplane.io/v1alpha2
-      kind: Object
-      spec:
-        forProvider:
-          manifest:
-            apiVersion: networking.k8s.io/v1
-            kind: Ingress
-            metadata:
-              name: app-ingress
-              annotations:
-                kubernetes.io/ingress.class: nginx
-            spec:
-              rules:
-              - host: app.local
-                http:
-                  paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: app-service
-                        port:
-                          number: 80
-    patches:
-    - fromFieldPath: "metadata.uid"
-      toFieldPath: "spec.forProvider.manifest.metadata.name"
-      transforms:
-      - type: string
-        string:
-          fmt: "%s-ingress"
-    - fromFieldPath: "metadata.uid"
-      toFieldPath: "spec.forProvider.manifest.spec.rules[0].http.paths[0].backend.service.name"
-      transforms:
-      - type: string
-        string:
-          fmt: "%s-svc"
-    - fromFieldPath: "metadata.labels[crossplane.io/claim-namespace]"
-      toFieldPath: "spec.forProvider.manifest.metadata.namespace"
-    - fromFieldPath: "metadata.name"
-      toFieldPath: "spec.forProvider.manifest.spec.rules[0].host"
-      transforms:
-      - type: string
-        string:
-          fmt: "%s.app.local"
+    - name: ingress
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha2
+        kind: Object
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: networking.k8s.io/v1
+              kind: Ingress
+              metadata:
+                name: app-ingress
+                annotations:
+                  kubernetes.io/ingress.class: nginx
+              spec:
+                rules:
+                  - host: app.local
+                    http:
+                      paths:
+                        - path: /
+                          pathType: Prefix
+                          backend:
+                            service:
+                              name: app-service
+                              port:
+                                number: 80
+      patches:
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.forProvider.manifest.metadata.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-ingress"
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.forProvider.manifest.spec.rules[0].http.paths[0].backend.service.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-svc"
+        - fromFieldPath: "metadata.labels[crossplane.io/claim-namespace]"
+          toFieldPath: "spec.forProvider.manifest.metadata.namespace"
+        - fromFieldPath: "metadata.name"
+          toFieldPath: "spec.forProvider.manifest.spec.rules[0].host"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s.app.local"

@@ -1,6 +1,6 @@
 # To test the platform APIs locally after bootstrapping, run:
 # kubectl apply -f hack/demo-xapp.yaml -n default
-# 
+#
 # This will trigger Crossplane to automatically provision a Deployment,
 # Service, and an Ingress mapped to local dev environment.
 

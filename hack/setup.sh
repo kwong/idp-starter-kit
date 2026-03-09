@@ -40,7 +40,7 @@ kubectl wait --namespace argocd \
 # 5. Phase 0: Local Vault Bootstrap (via Kustomize + Helm)
 echo "--> Phase 0: Deploying Vault for local dev token extraction..."
 kubectl create namespace vault --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply --server-side --force-conflicts -k components/vault/base/
+kustomize build --enable-helm components/vault/base/ | kubectl apply --server-side --force-conflicts -f -
 
 echo "--> Waiting for Vault to be ready..."
 kubectl wait --namespace vault \

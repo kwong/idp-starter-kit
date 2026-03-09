@@ -99,4 +99,4 @@ components:
   otel-collector: true
   tempo: true
   vault: true
-  # Note: Keycloak is automatically deployed when identity-provider.mode == internal 
+  # Note: Keycloak is automatically deployed when identity-provider.mode == internal

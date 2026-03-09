@@ -5,11 +5,9 @@ tempo:
       local:
         path: /var/tempo/traces
   retention: 24h
+  # Disable Helm test pods which often use 'latest' tags
+  test:
+    enabled: false
 
 # Deploy in a simplified monolithic structure for the local starter kit
 deployAsMonolith: true
-
-# Disable Helm test pods which often use 'latest' tags
-tempo:
-  test:
-    enabled: false

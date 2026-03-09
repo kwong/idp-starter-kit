@@ -6,7 +6,7 @@ server:
       - argocd.local
     paths:
       - /
-  
+
   config:
     url: "https://argocd.local"
 

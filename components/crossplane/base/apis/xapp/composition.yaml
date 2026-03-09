@@ -21,7 +21,7 @@ spec:
               metadata:
                 name: app-deployment
                 labels:
-                  env: dev # Satisfies Kyverno policy
+                  env: dev  # Satisfies Kyverno policy
               spec:
                 replicas: 1
                 selector:
@@ -31,13 +31,13 @@ spec:
                   metadata:
                     labels:
                       app: template
-                      env: dev # Satisfies Kyverno policy
+                      env: dev  # Satisfies Kyverno policy
                   spec:
                     containers:
                       - name: main
-                        image: nginx:1.25.0 # Updated dynamically
+                        image: nginx:1.25.0  # Updated dynamically
                         ports:
-                          - containerPort: 80 # Updated dynamically
+                          - containerPort: 80  # Updated dynamically
       patches:
         - fromFieldPath: "metadata.uid"
           toFieldPath: "spec.forProvider.manifest.metadata.name"
