@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Add Helm
         uses: azure/setup-helm@v4.2.0
 
@@ -91,7 +91,7 @@ jobs:
           # Here we give it some time to reconcile.
           sleep 60
           kubectl wait --for=condition=available deployment -l app.kubernetes.io/instance=argocd -n argocd --timeout=300s
-          
+
           # Check health of platform apps. Wait for key deployments.
           # This should be tailored based on exact critical paths.
           sleep 120

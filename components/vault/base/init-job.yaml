@@ -71,6 +71,5 @@ spec:
               else
                 echo "WARNING: oidc-config or vault-oidc-secret missing. Skipping OIDC config."
               fi
-              
               echo "Vault Configured Successfully!"
 

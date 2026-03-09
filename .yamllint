@@ -1,9 +1,14 @@
 extends: default
 
+ignore: |
+  **/charts/
+  bootstrap/env.yaml.example
+
 rules:
   line-length: disable
   document-start: disable
   truthy: disable
+  trailing-spaces: enable
   indentation:
     spaces: 2
     indent-sequences: true
