@@ -49,7 +49,8 @@ kubectl wait --namespace vault \
   --timeout=120s
 
 echo "--> Extracting ephemeral Vault root token from pod logs..."
-export VAULT_TOKEN=$(kubectl logs -n vault -l app.kubernetes.io/name=vault | grep 'Root Token:' | head -n 1 | awk '{print $3}')
+VAULT_TOKEN=$(kubectl logs -n vault -l app.kubernetes.io/name=vault | grep 'Root Token:' | head -n 1 | awk '{print $3}')
+export VAULT_TOKEN
 if [ -z "$VAULT_TOKEN" ]; then
   echo "Error: Could not retrieve dev root token. Is Vault in dev mode?"
   exit 1
@@ -67,7 +68,7 @@ chmod +x ./seed-vault-secrets.sh
 ./seed-vault-secrets.sh
 
 # Kill the port-forward
-kill $PF_PID
+kill "$PF_PID"
 
 # 6. Apply the Root App of Apps
 echo "--> Applying dev environment bootstrap Application..."

@@ -30,7 +30,8 @@ if [ -z "$ENVS" ]; then
 fi
 
 # 3. Process Each Environment
-for ENV_NAME in $ENVS; do
+echo "$ENVS" | while read -r ENV_NAME; do
+    [ -z "$ENV_NAME" ] && continue
     ENV_DIR="environments/$ENV_NAME"
     BOOTSTRAP_FILE="bootstrap/$ENV_NAME.yaml"
 
@@ -61,7 +62,8 @@ EOF
         local ENABLED="$2"
         # For Keycloak, check IdP mode instead of explicit component toggle
         if [ "$COMP" = "keycloak" ]; then
-            local IDP_MODE=$(yq e '.identity-provider.mode' "$VALUES_FILE")
+            local IDP_MODE
+            IDP_MODE=$(yq e '.identity-provider.mode' "$VALUES_FILE")
             if [ "$IDP_MODE" = "internal" ]; then
                 ENABLED="true"
             else
@@ -150,25 +152,25 @@ EOF
     
     # If this is the 'dev' environment, ensure AppProject exists in the bootstrap file
     if [ "$ENV_NAME" = "dev" ] && ! grep -q "kind: AppProject" "$BOOTSTRAP_FILE"; then
-        sed -i.bak '1i\
----\
-apiVersion: argoproj.io/v1alpha1\
-kind: AppProject\
-metadata:\
-  name: platform\
-  namespace: argocd\
-spec:\
-  description: "Core IDP platform components"\
-  sourceRepos:\
-    - \x27*\x27\
-  destinations:\
-    - namespace: \x27*\x27\
-      server: https://kubernetes.default.svc\
-  clusterResourceWhitelist:\
-    - group: \x27*\x27\
-      kind: \x27*\x27\
-' "$BOOTSTRAP_FILE"
-        rm -f "${BOOTSTRAP_FILE}.bak"
+        {
+            echo "---"
+            echo "apiVersion: argoproj.io/v1alpha1"
+            echo "kind: AppProject"
+            echo "metadata:"
+            echo "  name: platform"
+            echo "  namespace: argocd"
+            echo "spec:"
+            echo "  description: \"Core IDP platform components\""
+            echo "  sourceRepos:"
+            echo "    - '*'"
+            echo "  destinations:"
+            echo "    - namespace: '*'"
+            echo "      server: https://kubernetes.default.svc"
+            echo "  clusterResourceWhitelist:"
+            echo "    - group: '*'"
+            echo "      kind: '*'"
+            cat "$BOOTSTRAP_FILE"
+        } > "${BOOTSTRAP_FILE}.tmp" && mv "${BOOTSTRAP_FILE}.tmp" "$BOOTSTRAP_FILE"
     fi
 
 done

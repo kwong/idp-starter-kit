@@ -31,11 +31,11 @@ if command -v vault &> /dev/null; then
   VAULT_CMD="vault"
 else
   echo "--> Vault CLI not found locally. Falling back to kubectl exec inside Vault pod..."
-  VAULT_CMD="kubectl exec -it -n vault vault-0 -- vault"
+  VAULT_CMD="kubectl exec -n vault vault-0 -- vault"
 fi
 
 # Automatically enable kv-v2 if not already enabled
-$VAULT_CMD secrets enable -path=secret kv-v2 2>/dev/null || true
+"$VAULT_CMD" secrets enable -path=secret kv-v2 2>/dev/null || true
 
 # -----------------------------------------------------------------------------
 # Grafana OIDC Secret
@@ -47,7 +47,7 @@ if [ -z "$GRAFANA_CLIENT_SECRET" ]; then
 fi
 
 echo "--> Seeding Grafana OIDC secret to secret/identity-provider/grafana..."
-$VAULT_CMD kv put secret/identity-provider/grafana client_secret="$GRAFANA_CLIENT_SECRET" >/dev/null
+"$VAULT_CMD" kv put secret/identity-provider/grafana client_secret="$GRAFANA_CLIENT_SECRET" >/dev/null
 
 # -----------------------------------------------------------------------------
 # Vault OIDC Secret
@@ -59,6 +59,6 @@ if [ -z "$VAULT_CLIENT_SECRET" ]; then
 fi
 
 echo "--> Seeding Vault OIDC secret to secret/identity-provider/vault..."
-$VAULT_CMD kv put secret/identity-provider/vault client_secret="$VAULT_CLIENT_SECRET" >/dev/null
+"$VAULT_CMD" kv put secret/identity-provider/vault client_secret="$VAULT_CLIENT_SECRET" >/dev/null
 
 echo "==> Vault KV seeding complete!"
