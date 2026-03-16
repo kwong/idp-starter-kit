@@ -29,7 +29,13 @@ kubectl apply -n argocd --server-side=true --force-conflicts -f https://raw.gith
 # 4. Patch ArgoCD Server to run over HTTP (for local testing via Ingress)
 echo "--> Patching ArgoCD for local Ingress..."
 kubectl patch configmap argocd-cmd-params-cm -n argocd --type=merge -p '{"data":{"server.insecure":"true"}}'
+
+# Enable Kustomize Helm chart inflation (required for helmCharts in kustomization.yaml)
+echo "--> Enabling Kustomize Helm support in ArgoCD..."
+kubectl patch configmap argocd-cm -n argocd --type=merge -p '{"data":{"kustomize.buildOptions":"--enable-helm"}}'
+
 kubectl rollout restart deployment argocd-server -n argocd
+kubectl rollout restart deployment argocd-repo-server -n argocd
 
 echo "--> Waiting for ArgoCD to become ready..."
 kubectl wait --namespace argocd \
