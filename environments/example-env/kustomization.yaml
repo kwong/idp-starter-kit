@@ -16,6 +16,7 @@ resources:
 
   # Control Plane
   - ../../components/crossplane/base
+  - ../../components/crossplane-xapps/base
 
   # Secrets Backend
   - ../../components/vault/base
@@ -26,12 +27,17 @@ resources:
   - ../../components/tempo/base
   - ../../components/otel-collector/base
 
-# Add environment-specific Helm value patches here, e.g.:
+# Environment-specific patches for rendered Helm resources.
+# Uncomment and populate the relevant -values.yaml file to override defaults.
 # patches:
-#   - target:
-#       kind: HelmChart
-#       name: vault
-#     patch: |-
-#       - op: replace
-#         path: /spec/valuesFile
-#         value: vault-values.yaml
+#   - path: argocd-values.yaml
+#     target:
+#       kind: Deployment
+#       namespace: argocd
+#   - path: vault-values.yaml
+#     target:
+#       kind: StatefulSet
+#       namespace: vault
+#   - path: kube-prometheus-stack-values.yaml
+#     target:
+#       namespace: monitoring

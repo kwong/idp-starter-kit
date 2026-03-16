@@ -18,6 +18,7 @@ resources:
 
   # Control Plane
   - ../../components/crossplane/base
+  - ../../components/crossplane-xapps/base
 
   # Secrets Backend
   - ../../components/vault/base

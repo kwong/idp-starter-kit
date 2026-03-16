@@ -14,11 +14,11 @@ config:
 
     # Export logs to Loki
     loki:
-      endpoint: "http://loki.observability.svc.cluster.local:3100/loki/api/v1/push"
+      endpoint: "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
 
     # Export traces to Tempo
     otlp/tempo:
-      endpoint: "tempo.observability.svc.cluster.local:4317"
+      endpoint: "tempo.monitoring.svc.cluster.local:4317"
       tls:
         insecure: true
 

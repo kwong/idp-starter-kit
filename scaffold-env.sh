@@ -110,14 +110,31 @@ EOF
     add_component "kyverno" "$(get_toggle "kyverno" "true")"
     add_component "policies" "$(get_toggle "policies" "true")"
     add_component "crossplane" "$(get_toggle "crossplane" "true")"
+    add_component "crossplane-xapps" "$(get_toggle "crossplane-xapps" "true")"
     add_component "vault" "$(get_toggle "vault" "true")"
     add_component "kube-prometheus-stack" "$(get_toggle "kube-prometheus-stack" "true")"
     add_component "loki" "$(get_toggle "loki" "true")"
     add_component "tempo" "$(get_toggle "tempo" "true")"
     add_component "otel-collector" "$(get_toggle "otel-collector" "true")"
 
-    # 4. Generate Bootstrap ArgoCD Application
+    # 4. Generate Bootstrap ArgoCD Application (always includes AppProject)
     cat <<EOF > "$BOOTSTRAP_FILE"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: "Core IDP platform components"
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
 ---
 # Bootstrap Application for the '$ENV_NAME' environment.
 # Applied once during setup: kubectl apply -f bootstrap/$ENV_NAME.yaml
@@ -134,8 +151,6 @@ spec:
     repoURL: 'https://github.com/kwong/idp-starter-kit.git'
     targetRevision: HEAD
     path: environments/$ENV_NAME
-    kustomize:
-      enableHelm: true
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
@@ -149,29 +164,6 @@ spec:
 EOF
 
     echo "  Created environments/$ENV_NAME layer and bootstrap/$ENV_NAME.yaml"
-    
-    # If this is the 'dev' environment, ensure AppProject exists in the bootstrap file
-    if [ "$ENV_NAME" = "dev" ] && ! grep -q "kind: AppProject" "$BOOTSTRAP_FILE"; then
-        {
-            echo "---"
-            echo "apiVersion: argoproj.io/v1alpha1"
-            echo "kind: AppProject"
-            echo "metadata:"
-            echo "  name: platform"
-            echo "  namespace: argocd"
-            echo "spec:"
-            echo "  description: \"Core IDP platform components\""
-            echo "  sourceRepos:"
-            echo "    - '*'"
-            echo "  destinations:"
-            echo "    - namespace: '*'"
-            echo "      server: https://kubernetes.default.svc"
-            echo "  clusterResourceWhitelist:"
-            echo "    - group: '*'"
-            echo "      kind: '*'"
-            cat "$BOOTSTRAP_FILE"
-        } > "${BOOTSTRAP_FILE}.tmp" && mv "${BOOTSTRAP_FILE}.tmp" "$BOOTSTRAP_FILE"
-    fi
 
 done
 

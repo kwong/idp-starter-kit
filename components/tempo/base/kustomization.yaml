@@ -6,5 +6,5 @@ helmCharts:
     repo: https://grafana.github.io/helm-charts
     version: 1.10.1
     releaseName: tempo
-    namespace: observability
+    namespace: monitoring
     valuesFile: values.yaml

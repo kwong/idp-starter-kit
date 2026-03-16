@@ -92,6 +92,7 @@ components:
 
   # Optional / Toggleable modules
   crossplane: true
+  crossplane-xapps: true
   external-secrets: true
   kube-prometheus-stack: true
   kyverno: true
