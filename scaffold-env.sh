@@ -161,6 +161,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
 EOF
 
     echo "  Created environments/$ENV_NAME layer and bootstrap/$ENV_NAME.yaml"
