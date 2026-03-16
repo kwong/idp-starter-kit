@@ -14,6 +14,6 @@ configs:
   params:
     server.insecure: true
   cm:
-    # Allow Kustomize to pull upstream Helm charts when rendering applications
-    # that use helmCharts: in their kustomization.yaml (all platform/ modules)
-    kustomize.helm.enabled: "true"
+    # Allow Kustomize to inflate Helm charts when rendering applications
+    # that use helmCharts: in their kustomization.yaml
+    kustomize.buildOptions: "--enable-helm"

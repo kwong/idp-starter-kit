@@ -26,13 +26,13 @@ echo "--> Installing ArgoCD Core Components..."
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -n argocd --server-side=true --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-# 4. Patch ArgoCD Server to run over HTTP (for local testing via Ingress)
-echo "--> Patching ArgoCD for local Ingress..."
-kubectl patch configmap argocd-cmd-params-cm -n argocd --type=merge -p '{"data":{"server.insecure":"true"}}'
-
-# Enable Kustomize Helm chart inflation (required for helmCharts in kustomization.yaml)
-echo "--> Enabling Kustomize Helm support in ArgoCD..."
-kubectl patch configmap argocd-cm -n argocd --type=merge -p '{"data":{"kustomize.buildOptions":"--enable-helm"}}'
+# 4. Apply declarative ArgoCD config patches (bootstrap chicken-and-egg)
+# These settings are also declared in components/argocd/base/values.yaml so
+# ArgoCD self-manages them after the first sync. We apply them here because
+# ArgoCD needs --enable-helm to render its own Helm-based kustomization.
+echo "--> Applying ArgoCD bootstrap configuration..."
+kubectl apply --server-side --force-conflicts -f hack/argocd-cm-patch.yaml
+kubectl apply --server-side --force-conflicts -f hack/argocd-cmd-params-patch.yaml
 
 kubectl rollout restart deployment argocd-server -n argocd
 kubectl rollout restart deployment argocd-repo-server -n argocd
