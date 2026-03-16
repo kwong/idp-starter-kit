@@ -31,8 +31,8 @@ spec:
     # TODO: Change this to your actual repository URL
     repoURL: 'https://github.com/kwong/idp-starter-kit.git'
     targetRevision: HEAD
-    # The dev environment overlay aggregates all platform components
-    path: environments/dev
+    # Child Application definitions for app-of-apps deployment
+    path: bootstrap/apps/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
